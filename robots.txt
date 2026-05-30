@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://snhs-prog.github.io/tglawcet-2026-portal/sitemap.xml
