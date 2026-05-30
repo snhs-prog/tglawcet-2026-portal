@@ -440,6 +440,7 @@ service cloud.firestore {
       <div class="hero-eyebrow">Community Rank Portal · 2026</div>
       <h1>Submit Marks<br><em>Get Your Rank</em></h1>
       <p>3Y Shift 1 &amp; Shift 2 candidates are ranked together as one pool, matching official methodology. Results on June 5, 2026.</p>
+      <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-3);">This tab shows your estimated rank based on the marks you enter. Higher marks get a tighter range.</p>
     </section>
 
     <div class="cooldown" id="cooldownBanner">
@@ -457,6 +458,7 @@ service cloud.firestore {
         <div><div class="rmv" id="revealAvg">—</div><div class="rml">Pool Avg</div></div>
         <div><div class="rmv" id="revealPool">—</div><div class="rml">Pool Size</div></div>
       </div>
+      <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:var(--space-4);" id="revealRankRangeSmall">Estimated rank range will appear here.</p>
       <p style="font-size:var(--text-xs);color:var(--color-text-faint);margin-top:var(--space-4);">💡 Use the <strong>College Predictor</strong> tab to see which colleges you may qualify for.</p>
       <div style="display:flex;gap:var(--space-3);justify-content:center;margin-top:var(--space-5);">
         <button class="btn-secondary" onclick="document.getElementById('resultReveal').classList.remove('active')">Close</button>
@@ -940,6 +942,12 @@ document.getElementById('submitForm').addEventListener('submit',function(e){
   const rank=tPoolArr.findIndex(e=>e.score===score)+1;
   const pct=((tPoolArr.length-rank)/tPoolArr.length*100).toFixed(1);
   const avg=(tPoolArr.reduce((s,e)=>s+e.score,0)/tPoolArr.length).toFixed(1);
+  const spreadBase=examType==='3Y'?0.10:examType==='5Y'?0.08:0.12;
+  const scoreFactor=score>=90?0.05:score>=75?0.08:score>=60?0.10:0.14;
+  const spread=Math.max(2,Math.round(rank*(spreadBase+scoreFactor)));
+  const low=Math.max(1,rank-spread);
+  const high=rank+spread;
+  const chanceText=score>=90?'Very strong':score>=75?'Strong':score>=60?'Moderate':'Low';
   document.getElementById('revealCategory').textContent=`Estimated Rank — ${poolLabel(examType,shift)}`;
   document.getElementById('revealRank').textContent=rank;
   document.getElementById('revealOutOf').textContent=`out of ${tPoolArr.length} in this pool`;
@@ -947,6 +955,9 @@ document.getElementById('submitForm').addEventListener('submit',function(e){
   document.getElementById('revealPercentile').textContent=pct+'%';
   document.getElementById('revealAvg').textContent=avg;
   document.getElementById('revealPool').textContent=tPoolArr.length;
+  const rangeText=`Estimated rank range: ${low.toLocaleString()} - ${high.toLocaleString()}`;
+  document.getElementById('revealRankRange').textContent=rangeText;
+  document.getElementById('revealRankRangeSmall').textContent=`${rangeText} · Confidence: ${chanceText}`;
     document.getElementById('resultReveal').classList.add('active');
     document.getElementById('resultReveal').scrollIntoView({behavior:'smooth',block:'start'});
     const catMap={'OC':'OC','BC-A':'BC','BC-B':'BC','BC-C':'BC','BC-D':'BC','BC-E':'BC','SC':'SC','ST':'ST','PH':'OC','NCC':'OC'};
