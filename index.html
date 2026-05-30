@@ -198,8 +198,23 @@ tr.own-row:hover{background:color-mix(in oklch,var(--color-primary) 10%,var(--co
 .board-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-3);margin-bottom:var(--space-4);}
 .board-toolbar h2{font-size:var(--text-lg);font-weight:600;}
 .search-wrap{position:relative;}
+
+.search-wrap{position:relative;min-width:0;}
+.search-wrap svg{left:14px;}
+.search-inp{min-width:0;line-height:1.2;}
+
+
+.board-search-row{display:flex;justify-content:flex-start;margin:0 0 var(--space-4);}
+.board-search-row .search-wrap{width:min(360px,100%);}
+.board-search-row .search-inp{width:100%;}
+@media(max-width:600px){
+  .board-search-row{margin-bottom:var(--space-3);}
+  .board-search-row .search-wrap{width:100%;}
+  .filter-row{margin-top:0;}
+}
+
 .search-wrap svg{position:absolute;left:var(--space-3);top:50%;transform:translateY(-50%);color:var(--color-text-faint);pointer-events:none;}
-.search-inp{padding:var(--space-2) var(--space-4) var(--space-2) calc(var(--space-3) + 20px + var(--space-2));border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface-2);font-size:var(--text-sm);width:220px;}
+.search-inp{padding:var(--space-2) var(--space-4) var(--space-2) 42px;border:1px solid var(--color-border);border-radius:var(--radius-md);background:var(--color-surface-2);font-size:var(--text-sm);width:220px;}
 .filter-row{display:flex;flex-wrap:wrap;gap:var(--space-2);margin-bottom:var(--space-4);}
 .filter-chip{padding:var(--space-1) var(--space-3);border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:600;border:1px solid var(--color-border);background:var(--color-surface-2);color:var(--color-text-muted);cursor:pointer;}
 .filter-chip.on{background:var(--color-primary);color:var(--color-text-inverse);border-color:var(--color-primary);}
@@ -300,7 +315,7 @@ canvas{border-radius:var(--radius-md);}
   .pagination{flex-wrap:wrap;}
   .page-btn{width:34px;height:34px;}
   tbody td, thead th{font-size:.78rem;}
-  table{min-width:760px;}
+  table{min-width:880px;}
   .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
   #toast-cnt{left:12px;right:12px;bottom:12px;}
   .toast{max-width:none;}
@@ -551,10 +566,10 @@ service cloud.firestore {
     <!-- Live Board -->
     <section>
       <div class="board-toolbar">
-        <h2>📊 Live Rank Board</h2>
+        <h2>📊 Live Rank Board</h2><div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:2px;">Range shown is an estimated LAWCET rank range based on the marks entered.</div>
         <div class="search-wrap">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input class="search-inp" type="text" id="searchInp" placeholder="Name / hall ticket…" aria-label="Search">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-inp" type="text" id="searchInp" placeholder="Search name or hall ticket…" aria-label="Search">
         </div>
       </div>
 
@@ -575,7 +590,7 @@ service cloud.firestore {
       <div class="table-wrap">
         <div class="table-scroll">
           <table aria-label="Live rank board">
-            <thead><tr><th>Rank</th><th>Name</th><th>Marks</th><th>Exam</th><th>Category</th><th>Hall Ticket</th><th>Time</th></tr></thead>
+            <thead><tr><th>Rank</th><th>Name</th><th>Marks</th><th>Est. Rank Range</th><th>Exam</th><th>Category</th><th>Hall Ticket</th><th>Time</th></tr></thead>
             <tbody id="tBody"></tbody>
           </table>
         </div>
@@ -995,6 +1010,16 @@ document.getElementById('filterRow').addEventListener('click',e=>{
 document.getElementById('searchInp').addEventListener('input',function(){searchQuery=this.value.trim();currentPage=1;renderTable(searchQuery,activeFilter);});
 
 function scorePill(s){const cls=s>=80?'sp-hi':s>=50?'sp-md':'sp-lo';return`<span class="score-pill ${cls}">${s}</span>`;}
+function estimateRankRange(score, examType){
+  const base = examType==='3Y' ? 0.10 : examType==='5Y' ? 0.08 : 0.12;
+  const factor = score>=90 ? 0.05 : score>=75 ? 0.08 : score>=60 ? 0.10 : 0.14;
+  const total = examType==='3Y' ? 30000 : examType==='5Y' ? 8000 : 3000;
+  const estRank = score>=90 ? Math.max(1, Math.round((120-score)*18 + 1)) : score>=75 ? Math.round((120-score)*35) : score>=60 ? Math.round((120-score)*70) : Math.round((120-score)*120);
+  const spread = Math.max(2, Math.round(estRank * (base + factor)));
+  const low = Math.max(1, estRank - spread);
+  const high = Math.min(total, estRank + spread);
+  return {estRank, low, high};
+}
 function rankBadge(r){const cls=r===1?'rk1':r===2?'rk2':r===3?'rk3':'rko';return`<span class="rank-badge ${cls}">${r}</span>`;}
 function shiftTag(e){
   if(e.examType==='3Y')return`<span class="shift-tag ${e.shift==='S1'?'s1':'s2'}">${e.shift==='S1'?'S1':'S2'}</span>`;
@@ -1018,10 +1043,12 @@ function renderTable(q='',filter='ALL'){
     const pArr=entries.filter(e=>getPool(e.examType)===p3);
     const gr=pArr.findIndex(e=>e.id===entry.id)+1;
     const own=entry.id===myId;
+    const r=estimateRankRange(entry.score, entry.examType);
     return`<tr class="${own?'own-row':''}">
       <td>${rankBadge(gr)}</td>
       <td style="font-weight:${own?600:400}">${entry.name}${own?' <span style="font-size:var(--text-xs);color:var(--color-primary);">(You)</span>':''}</td>
       <td>${scorePill(entry.score)}</td>
+      <td><span class="score-pill sp-md" style="white-space:nowrap">${r.low.toLocaleString()}–${r.high.toLocaleString()}</span></td>
       <td>${shiftTag(entry)}</td>
       <td style="font-size:var(--text-xs);font-weight:500">${entry.category}</td>
       <td style="font-family:monospace;font-size:var(--text-xs);color:var(--color-text-muted)">${entry.hallTicket}</td>
