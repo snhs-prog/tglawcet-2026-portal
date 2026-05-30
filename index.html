@@ -81,6 +81,14 @@ h1,h2,h3{text-wrap:balance;line-height:1.2;}
 .nav-btn{padding:var(--space-4) var(--space-6);font-size:var(--text-sm);font-weight:500;color:var(--color-text-muted);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap;display:flex;align-items:center;gap:var(--space-2);}
 .nav-btn:hover{color:var(--color-text);}
 .nav-btn.active{color:var(--color-primary);border-bottom-color:var(--color-primary);font-weight:600;}
+
+.main-nav{padding:0 8px;}
+.nav-btn{border-radius:0;}
+@media(max-width:480px){
+  .main-nav{padding:0 4px;}
+  .nav-btn{padding:10px 10px;}
+}
+
 .nav-panel{display:none;}
 .nav-panel.active{display:block;}
 main{max-width:980px;margin-inline:auto;padding:var(--space-8) var(--space-6) var(--space-16);}
@@ -252,6 +260,46 @@ canvas{border-radius:var(--radius-md);}
 .score-col{font-family:monospace;font-weight:700;}
 .rank-col{font-variant-numeric:tabular-nums;}
 
+
+@media(max-width:768px){
+  .site-header{padding:12px 14px;}
+  .logo{font-size:1rem;}
+  .hero h1,.predictor-hero h2,.mvr-hero h2{font-size:clamp(1.6rem,8vw,2.2rem);}
+  .card,.elig-box,.calc-box,.chart-wrap,.mvr-table-wrap{padding:16px;}
+  .main-nav,.tab-row,.filter-row,#chanceFilter{gap:8px;}
+  .nav-btn,.tab-btn,.filter-chip{padding:10px 12px;font-size:.85rem;}
+  .search-inp{width:100%;max-width:100%;}
+  .board-toolbar,.mvr-table-head{align-items:flex-start;}
+  .table-wrap,.mvr-table-wrap,.chart-wrap,.calc-box{border-radius:16px;}
+  thead th, tbody td{padding:10px 12px;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .result-meta,.rank-meta-grid{grid-template-columns:1fr 1fr;}
+  .predictor-form{grid-template-columns:1fr;}
+  .predict-btn{width:100%;justify-content:center;}
+}
+@media(max-width:480px){
+  main{padding:18px 12px 48px;}
+  .hero{margin-bottom:24px;}
+  .hero p,.predictor-hero p,.mvr-hero p,.card-sub{font-size:.92rem;}
+  .badge-live{font-size:11px;}
+  .stat-card{padding:12px;}
+  .stat-val,.rmv,.rank-result-num{font-size:1.4rem;}
+  .result-reveal,.rank-result-box{padding:18px;}
+  .form-grid{gap:12px;}
+  input[type=text],input[type=number],select{padding:12px 14px;}
+  .captcha-box{flex-direction:column;align-items:flex-start;gap:10px;}
+  .captcha-q{font-size:.95rem;}
+  .shift-toggle{flex-direction:column;}
+  .shift-btn{width:100%;}
+  .pagination{flex-wrap:wrap;}
+  .page-btn{width:34px;height:34px;}
+  tbody td, thead th{font-size:.78rem;}
+  table{min-width:760px;}
+  .table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  #toast-cnt{left:12px;right:12px;bottom:12px;}
+  .toast{max-width:none;}
+}
+
 /* Toast */
 #toast-cnt{position:fixed;bottom:var(--space-6);right:var(--space-6);z-index:999;display:flex;flex-direction:column;gap:var(--space-2);}
 .toast{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3) var(--space-5);background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);font-size:var(--text-sm);animation:slideup .3s cubic-bezier(.16,1,.3,1);max-width:320px;}
@@ -388,7 +436,7 @@ service cloud.firestore {
 
     <section class="hero">
       <div class="hero-eyebrow">Community Rank Portal · 2026</div>
-      <h1>Submit Your Marks &amp;<br><em>See Your Live Rank</em></h1>
+      <h1>Submit Marks<br><em>Get Your Rank</em></h1>
       <p>3Y Shift 1 &amp; Shift 2 candidates are ranked together as one pool, matching official methodology. Results on June 5, 2026.</p>
     </section>
 
@@ -416,7 +464,7 @@ service cloud.firestore {
 
     <section class="card">
       <div class="card-title">Submit Your Marks</div>
-      <div class="card-sub">Only name &amp; category appear publicly. Hall ticket used for deduplication only — never displayed.</div>
+      <div class="card-sub">Simple, fast, mobile-friendly portal. Hall ticket is used only to prevent duplicates.</div>
 
       <form id="submitForm" novalidate>
         <div class="form-grid">
@@ -692,7 +740,7 @@ service cloud.firestore {
 
     <section class="mvr-hero">
       <div class="hero-eyebrow">Based on 2025 Official Data · 2026 Estimate</div>
-      <h2>Marks → Rank<br><em>Estimator</em></h2>
+      <h2>Marks to Rank<br><em>Estimator</em></h2>
       <p>Enter your score to instantly see your estimated rank range for 2026, based on official 2025 rank vs marks data and normalization trends.</p>
     </section>
 
