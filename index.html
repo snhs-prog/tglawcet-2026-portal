@@ -75,6 +75,12 @@ h1,h2,h3{text-wrap:balance;line-height:1.2;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 .theme-toggle{width:36px;height:36px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;color:var(--color-text-muted);}
 .theme-toggle:hover{background:var(--color-surface-offset);color:var(--color-text);}
+
+.main-nav,.tab-row,.filter-row,#chanceFilter,.table-scroll{scrollbar-width:thin;}
+.main-nav::-webkit-scrollbar,.tab-row::-webkit-scrollbar,.filter-row::-webkit-scrollbar,#chanceFilter::-webkit-scrollbar,.table-scroll::-webkit-scrollbar{height:8px;}
+.main-nav::-webkit-scrollbar-thumb,.tab-row::-webkit-scrollbar-thumb,.filter-row::-webkit-scrollbar-thumb,#chanceFilter::-webkit-scrollbar-thumb,.table-scroll::-webkit-scrollbar-thumb{background:color-mix(in oklch,var(--color-text-muted) 45%,transparent);border-radius:999px;}
+.main-nav::-webkit-scrollbar-track,.tab-row::-webkit-scrollbar-track,.filter-row::-webkit-scrollbar-track,#chanceFilter::-webkit-scrollbar-track,.table-scroll::-webkit-scrollbar-track{background:transparent;}
+
 /* Nav */
 .main-nav{display:flex;gap:0;border-bottom:1px solid var(--color-divider);background:var(--color-surface);overflow-x:auto;scrollbar-width:none;}
 .main-nav::-webkit-scrollbar{display:none;}
@@ -350,7 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ Firebase tglawcet-2026 initialized');
 });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 
@@ -381,10 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     College Predictor
   </button>
-  <button class="nav-btn" data-nav="marksrank">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-    Marks vs Rank
-  </button>
+
   <button class="nav-btn" data-nav="eligibility">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
     Eligibility Guide
@@ -571,7 +573,7 @@ service cloud.firestore {
       <div class="table-wrap">
         <div class="table-scroll">
           <table aria-label="Live rank board">
-            <thead><tr><th>Rank</th><th>Name</th><th>Exam</th><th>Category</th><th>Score</th><th>Hall Ticket</th><th>Time</th></tr></thead>
+            <thead><tr><th>Rank</th><th>Name</th><th>Marks</th><th>Exam</th><th>Category</th><th>Hall Ticket</th><th>Time</th></tr></thead>
             <tbody id="tBody"></tbody>
           </table>
         </div>
@@ -733,105 +735,7 @@ service cloud.firestore {
   </div>
 
 
-  <!-- ═══════════════════════════════════════════
-       PANEL 4 — MARKS VS RANK
-  ═══════════════════════════════════════════ -->
-  <div class="nav-panel" id="marksrank">
-
-    <section class="mvr-hero">
-      <div class="hero-eyebrow">Based on 2025 Official Data · 2026 Estimate</div>
-      <h2>Marks to Rank<br><em>Estimator</em></h2>
-      <p>Enter your score to instantly see your estimated rank range for 2026, based on official 2025 rank vs marks data and normalization trends.</p>
-    </section>
-
-    <div class="banner info" style="margin-bottom:var(--space-6);">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-      <span>Since 2026 has <strong>two shifts for 3Y LLB</strong>, scores are <strong>normalized</strong> before ranking. The estimates below are based on normalized marks. Rank may vary by ±5–10% depending on 2026 difficulty level and number of applicants.</span>
-    </div>
-
-    <div class="calc-box">
-      <div class="card-title" style="margin-bottom:var(--space-1);">🎯 Instant Rank Calculator</div>
-      <div class="card-sub">Enter your score to see your expected rank range</div>
-      <div class="calc-row">
-        <div class="form-group">
-          <label for="mvrScore">Your Score <span class="req">*</span> <span class="hint">0–120</span></label>
-          <input type="number" id="mvrScore" placeholder="e.g. 75" min="0" max="120">
-        </div>
-        <div class="form-group">
-          <label for="mvrCourse">Course</label>
-          <select id="mvrCourse">
-            <option value="3Y">3-Year LLB (Combined)</option>
-            <option value="5Y">5-Year LLB</option>
-            <option value="PG">PG LLM</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <button type="button" class="btn-primary" id="mvrBtn" style="margin-top:auto;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-            Estimate Rank
-          </button>
-        </div>
-      </div>
-
-      <!-- Result box -->
-      <div class="rank-result-box" id="mvrResult">
-        <div style="font-size:var(--text-xs);font-weight:600;color:var(--color-primary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:var(--space-2);" id="mvrResultLabel">Expected Rank — 3Y LLB 2026</div>
-        <div class="rank-result-num" id="mvrRankNum">—</div>
-        <div class="rank-result-range" id="mvrRankRange">Rank range: — to —</div>
-        <div style="font-size:var(--text-sm);color:var(--color-text-muted);" id="mvrMerit">Merit Standing: —</div>
-        <div class="rank-meta-grid">
-          <div class="rmc"><div class="rmc-val" id="mvrPct">—%</div><div class="rmc-lbl">Top Percentile</div></div>
-          <div class="rmc"><div class="rmc-val" id="mvrBetter">—</div><div class="rmc-lbl">Ahead of est.</div></div>
-          <div class="rmc"><div class="rmc-val" id="mvrOUChance">—</div><div class="rmc-lbl">OU Law Chance</div></div>
-        </div>
-        <p style="font-size:var(--text-xs);color:var(--color-primary);margin-top:var(--space-4);opacity:.75;">💡 Scroll down to see full marks vs rank table. Tap <strong>College Predictor</strong> to use this rank.</p>
-      </div>
-    </div>
-
-    <!-- Chart -->
-    <div class="chart-wrap">
-      <div class="chart-title">Marks vs Expected Rank — 3Y LLB 2026 <span>(based on 2025 official data)</span></div>
-      <canvas id="mvrChart" height="300"></canvas>
-    </div>
-
-    <!-- Full table -->
-    <div class="mvr-table-wrap">
-      <div class="mvr-table-head">
-        <div>
-          <div style="font-size:var(--text-base);font-weight:600;">Complete Marks vs Rank Reference Table</div>
-          <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:2px;">2025 official data + 2026 estimate · Shift 1 + Shift 2 combined for 3Y</div>
-        </div>
-        <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;" id="mvrFilter">
-          <button class="filter-chip on" data-mf="3Y">3Y LLB</button>
-          <button class="filter-chip" data-mf="5Y">5Y LLB</button>
-          <button class="filter-chip" data-mf="PG">PG LLM</button>
-        </div>
-      </div>
-      <div class="table-scroll">
-        <table aria-label="Marks vs Rank table">
-          <thead>
-            <tr>
-              <th>Score Range</th>
-              <th>Exact Score</th>
-              <th>2025 Rank</th>
-              <th>2026 Est. Rank</th>
-              <th>Merit Standing</th>
-              <th>OU LLB Chance</th>
-            </tr>
-          </thead>
-          <tbody id="mvrTbody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="banner warn" style="margin-top:var(--space-6);">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-      <span><strong>Note on Normalization:</strong> For 3Y LLB, TS LAWCET uses inter-session normalization across shifts. A 70 in Shift 1 and a 70 in Shift 2 may yield slightly different normalized marks. The formula used is: Normalized Mark = GASD + (GTA−GASD)/(STA−SASD) × (Candidate Mark − SASD). Final rank is based on normalized marks.</span>
-    </div>
-
-  </div>
-
-</main>
+  
 
 <footer>
   Unofficial community portal. Official results on <strong>June 5, 2026</strong> at <a href="https://lawcet.tgche.ac.in" target="_blank" rel="noopener noreferrer">lawcet.tgche.ac.in</a>. College cutoff data based on 2025 counselling. No data stored on any server.
@@ -1106,9 +1010,9 @@ function renderTable(q='',filter='ALL'){
     return`<tr class="${own?'own-row':''}">
       <td>${rankBadge(gr)}</td>
       <td style="font-weight:${own?600:400}">${entry.name}${own?' <span style="font-size:var(--text-xs);color:var(--color-primary);">(You)</span>':''}</td>
+      <td>${scorePill(entry.score)}</td>
       <td>${shiftTag(entry)}</td>
       <td style="font-size:var(--text-xs);font-weight:500">${entry.category}</td>
-      <td>${scorePill(entry.score)}</td>
       <td style="font-family:monospace;font-size:var(--text-xs);color:var(--color-text-muted)">${entry.hallTicket}</td>
       <td style="font-size:var(--text-xs);color:var(--color-text-faint)">${fmtTime(entry.time)}</td>
     </tr>`;
@@ -1281,165 +1185,6 @@ if (typeof firebaseConfig !== 'undefined' && firebaseConfig.apiKey === 'YOUR_API
   document.getElementById('setupGuide').style.display = 'block';
 }
 
-
-// ════════════════════════════════
-// MARKS VS RANK DATA (2025 official + 2026 estimate)
-// Source: Careers360 TS LAWCET 2025 marks vs rank
-// ════════════════════════════════
-const mvrData3Y=[
-  {score:120,rank2025:1,range:"100-120",merit:"🏆 Exceptional",ouChance:"✅ Certain"},
-  {score:97,rank2025:1,range:"97-99",merit:"🏆 Exceptional",ouChance:"✅ Certain"},
-  {score:93,rank2025:50,range:"93-96",merit:"🔥 Excellent",ouChance:"✅ Certain"},
-  {score:90,rank2025:100,range:"90-92",merit:"🔥 Excellent",ouChance:"✅ Certain"},
-  {score:87,rank2025:150,range:"87-89",merit:"🔥 Excellent",ouChance:"✅ Certain"},
-  {score:83,rank2025:200,range:"83-86",merit:"⭐ Very Good",ouChance:"✅ Certain"},
-  {score:80,rank2025:300,range:"80-82",merit:"⭐ Very Good",ouChance:"✅ Certain"},
-  {score:77,rank2025:500,range:"77-79",merit:"⭐ Very Good",ouChance:"⚠️ Likely"},
-  {score:74,rank2025:700,range:"74-76",merit:"✅ Good",ouChance:"⚠️ Likely"},
-  {score:72,rank2025:900,range:"72-73",merit:"✅ Good",ouChance:"⚠️ Possible"},
-  {score:70,rank2025:1100,range:"70-71",merit:"✅ Good",ouChance:"⚠️ Possible"},
-  {score:67,rank2025:1500,range:"67-69",merit:"✅ Good",ouChance:"❌ Unlikely"},
-  {score:65,rank2025:2000,range:"65-66",merit:"📘 Average",ouChance:"❌ Unlikely"},
-  {score:63,rank2025:2500,range:"63-64",merit:"📘 Average",ouChance:"❌ Unlikely"},
-  {score:60,rank2025:3000,range:"60-62",merit:"📘 Average",ouChance:"❌ Unlikely"},
-  {score:57,rank2025:4000,range:"57-59",merit:"📘 Average",ouChance:"❌ No"},
-  {score:55,rank2025:5000,range:"55-56",merit:"⚠️ Below Avg",ouChance:"❌ No"},
-  {score:52,rank2025:6000,range:"52-54",merit:"⚠️ Below Avg",ouChance:"❌ No"},
-  {score:50,rank2025:7000,range:"50-51",merit:"⚠️ Below Avg",ouChance:"❌ No"},
-  {score:48,rank2025:8000,range:"48-49",merit:"⚠️ Below Avg",ouChance:"❌ No"},
-  {score:47,rank2025:9500,range:"47",merit:"⚠️ Low Merit",ouChance:"❌ No"},
-  {score:46,rank2025:10500,range:"46",merit:"⚠️ Low Merit",ouChance:"❌ No"},
-  {score:45,rank2025:11500,range:"45",merit:"⚠️ Low Merit",ouChance:"❌ No"},
-  {score:44,rank2025:12500,range:"44",merit:"⚠️ Low Merit",ouChance:"❌ No"},
-  {score:43,rank2025:13500,range:"43",merit:"⚠️ Low Merit",ouChance:"❌ No"},
-  {score:42,rank2025:14500,range:"42",merit:"✔ Qualifying Min",ouChance:"❌ No"},
-];
-const mvrData5Y=[
-  {score:97,rank2025:2,range:"90-120",merit:"🏆 Exceptional",ouChance:"✅ Certain"},
-  {score:87,rank2025:50,range:"85-89",merit:"🔥 Excellent",ouChance:"✅ Certain"},
-  {score:80,rank2025:100,range:"80-84",merit:"🔥 Excellent",ouChance:"✅ Certain"},
-  {score:75,rank2025:200,range:"75-79",merit:"⭐ Very Good",ouChance:"✅ Certain"},
-  {score:70,rank2025:400,range:"70-74",merit:"✅ Good",ouChance:"⚠️ Likely"},
-  {score:65,rank2025:700,range:"65-69",merit:"✅ Good",ouChance:"⚠️ Possible"},
-  {score:60,rank2025:1200,range:"60-64",merit:"📘 Average",ouChance:"⚠️ Possible"},
-  {score:55,rank2025:2000,range:"55-59",merit:"📘 Average",ouChance:"❌ Unlikely"},
-  {score:50,rank2025:3000,range:"50-54",merit:"⚠️ Below Avg",ouChance:"❌ No"},
-  {score:45,rank2025:4500,range:"45-49",merit:"⚠️ Below Avg",ouChance:"❌ No"},
-  {score:42,rank2025:6000,range:"42-44",merit:"✔ Qualifying Min",ouChance:"❌ No"},
-];
-const mvrDataPG=[
-  {score:90,rank2025:5,range:"85-120",merit:"🏆 Exceptional",ouChance:"✅ Certain"},
-  {score:80,rank2025:30,range:"78-84",merit:"🔥 Excellent",ouChance:"✅ Certain"},
-  {score:70,rank2025:100,range:"68-77",merit:"⭐ Very Good",ouChance:"✅ Certain"},
-  {score:65,rank2025:200,range:"63-67",merit:"✅ Good",ouChance:"⚠️ Likely"},
-  {score:60,rank2025:350,range:"58-62",merit:"✅ Good",ouChance:"⚠️ Possible"},
-  {score:55,rank2025:550,range:"53-57",merit:"📘 Average",ouChance:"❌ Unlikely"},
-  {score:50,rank2025:800,range:"48-52",merit:"📘 Average",ouChance:"❌ Unlikely"},
-  {score:45,rank2025:1200,range:"43-47",merit:"⚠️ Below Avg",ouChance:"❌ No"},
-  {score:30,rank2025:2000,range:"30-42",merit:"✔ Qualifying Min",ouChance:"❌ No"},
-];
-
-function getActiveMvrData(c){return c==='3Y'?mvrData3Y:c==='5Y'?mvrData5Y:mvrDataPG;}
-// 2026 estimated rank = 2025 rank * 1.05 (slight uptick due to more awareness)
-function est2026(r){return Math.round(r*1.05);}
-
-// ── Render MVR table ──
-let mvrActiveCourse='3Y';
-document.getElementById('mvrFilter').addEventListener('click',e=>{
-  const c=e.target.closest('.filter-chip');if(!c)return;
-  document.querySelectorAll('#mvrFilter .filter-chip').forEach(x=>x.classList.remove('on'));
-  c.classList.add('on');mvrActiveCourse=c.dataset.mf;
-  renderMvrTable(mvrActiveCourse);drawChart(mvrActiveCourse);
-});
-
-function renderMvrTable(course){
-  const data=getActiveMvrData(course);
-  const tbody=document.getElementById('mvrTbody');
-  tbody.innerHTML=data.map(r=>{
-    const e26=est2026(r.rank2025);
-    const hi=r.merit.includes('Exceptional')||r.merit.includes('Excellent');
-    const md=r.merit.includes('Very Good')||r.merit.includes('Good');
-    const pillCls=hi?'sp-hi':md?'sp-md':'sp-lo';
-    return`<tr class="${r.merit.includes('Qualifying')?'highlight-row':''}">
-      <td><span class="score-pill ${pillCls}">${r.range}</span></td>
-      <td class="score-col">${r.score}</td>
-      <td class="rank-col">${r.rank2025.toLocaleString()}</td>
-      <td class="rank-col" style="font-weight:600;color:var(--color-primary)">${e26.toLocaleString()}</td>
-      <td style="font-size:var(--text-xs)">${r.merit}</td>
-      <td style="font-size:var(--text-xs)">${r.ouChance}</td>
-    </tr>`;
-  }).join('');
-}
-renderMvrTable('3Y');
-
-// ── Chart.js ──
-let mvrChartInstance=null;
-function drawChart(course){
-  const data=getActiveMvrData(course);
-  const labels=data.map(d=>d.score).reverse();
-  const r25=data.map(d=>d.rank2025).reverse();
-  const r26=data.map(d=>est2026(d.rank2025)).reverse();
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  const gridC=isDark?'rgba(255,255,255,.06)':'rgba(0,0,0,.06)';
-  const textC=isDark?'#797876':'#7a7974';
-  const ctx=document.getElementById('mvrChart').getContext('2d');
-  if(mvrChartInstance)mvrChartInstance.destroy();
-  mvrChartInstance=new Chart(ctx,{
-    type:'line',
-    data:{
-      labels,
-      datasets:[
-        {label:'2025 Official Rank',data:r25,borderColor:'#4f98a3',backgroundColor:'rgba(79,152,163,.08)',pointRadius:3,pointBackgroundColor:'#4f98a3',tension:.35,fill:true,borderWidth:2},
-        {label:'2026 Estimated Rank',data:r26,borderColor:'#e8af34',backgroundColor:'rgba(232,175,52,.05)',pointRadius:3,pointBackgroundColor:'#e8af34',tension:.35,fill:false,borderWidth:2,borderDash:[6,3]},
-      ]
-    },
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      scales:{
-        x:{grid:{color:gridC},ticks:{color:textC,font:{size:11}},title:{display:true,text:'Score (out of 120)',color:textC,font:{size:12}}},
-        y:{reverse:false,grid:{color:gridC},ticks:{color:textC,font:{size:11},callback:v=>v>=1000?Math.round(v/1000)+'k':v},title:{display:true,text:'Rank',color:textC,font:{size:12}}}
-      },
-      plugins:{legend:{labels:{color:textC,font:{size:12},usePointStyle:true}},tooltip:{callbacks:{label:ctx=>`${ctx.dataset.label}: Rank ${ctx.raw.toLocaleString()}`}}},
-      interaction:{mode:'index',intersect:false}
-    }
-  });
-}
-
-// ── Instant calculator ──
-document.getElementById('mvrBtn').addEventListener('click',()=>{
-  const s=parseInt(document.getElementById('mvrScore').value);
-  const c=document.getElementById('mvrCourse').value;
-  if(isNaN(s)||s<0||s>120){toast('Enter a valid score (0-120)','error');return;}
-  const data=getActiveMvrData(c);
-  // Interpolate rank
-  let rank2025=null,rowIdx=-1;
-  for(let i=0;i<data.length;i++){
-    if(s>=data[i].score){rowIdx=i;rank2025=data[i].rank2025;break;}
-  }
-  if(rank2025===null){rank2025=data[data.length-1].rank2025+2000;}
-  if(s<42&&c!=='PG'){toast('Score below qualifying minimum (42). SC/ST candidates have no minimum.','error');}
-  if(s<30&&c==='PG'){toast('Score below qualifying minimum (30). SC/ST candidates have no minimum.','error');}
-  const r26=est2026(rank2025);
-  const lo=Math.round(r26*0.92),hi=Math.round(r26*1.08);
-  const totalCandidates=c==='3Y'?30000:c==='5Y'?8000:3000;
-  const pct=((totalCandidates-r26)/totalCandidates*100).toFixed(1);
-  const better=Math.max(0,totalCandidates-r26);
-  const merit=rowIdx>=0?data[rowIdx].merit:'⚠️ Below Qualifying';
-  const ouC=rowIdx>=0?data[rowIdx].ouChance:'❌ No';
-  const cLabel=c==='3Y'?'3-Year LLB (Combined Shifts)':c==='5Y'?'5-Year LLB':'PG LLM';
-  document.getElementById('mvrResultLabel').textContent=`Expected Rank — ${cLabel} 2026`;
-  document.getElementById('mvrRankNum').textContent=r26.toLocaleString();
-  document.getElementById('mvrRankRange').textContent=`Estimated range: ${lo.toLocaleString()} – ${hi.toLocaleString()}`;
-  document.getElementById('mvrMerit').textContent='Merit Standing: '+merit;
-  document.getElementById('mvrPct').textContent='Top '+pct+'%';
-  document.getElementById('mvrBetter').textContent='~'+better.toLocaleString();
-  document.getElementById('mvrOUChance').textContent=ouC;
-  document.getElementById('mvrResult').classList.add('show');
-  // Auto-fill predictor
-  document.getElementById('predRank').value=r26;
-  document.getElementById('predCourse').value=c==='PG'?'PG':c;
-  toast('Rank estimated! → Jump to College Predictor to see admission chances.','success');
-});
 
 // Load chart on first view
 const chartObs=new IntersectionObserver((entries)=>{
